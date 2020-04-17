@@ -43,7 +43,8 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobScheduler.schedule(jobInfo)
+        val scheduleResult = jobScheduler.schedule(jobInfo)
+        Log.d("MainActivity", "Scheduling Result " + scheduleResult)
 
         // Setup websocket connection
         val cm = ConnectionManager()

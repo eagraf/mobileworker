@@ -5,12 +5,11 @@ import okhttp3.*
 import okio.ByteString
 
 class ConnectionManager {
-    var client: OkHttpClient
-    var webSocket: WebSocket?
+    private var client: OkHttpClient = OkHttpClient()
+    private var webSocket: WebSocket?
     var connected: Boolean
 
     init {
-        client = OkHttpClient()
         webSocket = null
         connected = false
         Log.d("ConnectionManager", "Initializing")
@@ -38,12 +37,7 @@ class ConnectionManager {
 
 class WorkerListener(cm: ConnectionManager): WebSocketListener() {
 
-    var connectionManager: ConnectionManager
-
-    init {
-        connectionManager = cm
-    }
-
+    private var connectionManager: ConnectionManager = cm
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         connectionManager.connected = true
