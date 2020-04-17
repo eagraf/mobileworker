@@ -29,7 +29,7 @@ class ConnectionManager {
 
     fun disconnect() {
         Log.d("ConnectionManager", "Disconnecting")
-        if (connected != false) {
+        if (connected) {
             webSocket!!.close(1000, "User forced close")
             connected = false
         }
