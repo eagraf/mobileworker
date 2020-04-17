@@ -12,17 +12,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val cm = ConnectionManager()
+
         val connectionToggle: ToggleButton = findViewById(R.id.connectionToggle)
         connectionToggle.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 // Attempt to connect to synchronizer
                 Log.d("MainActivity", "Connect")
+                cm.connect()
 
             } else {
                 // Disconnect from synchronizer
                 Log.d("MainActivity", "Disconnect")
-
+                cm.disconnect()
             }
         }
+
     }
 }
