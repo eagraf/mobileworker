@@ -29,7 +29,6 @@ class Executor() {
         var nextBoard: MutableList<Int> = ArrayList<Int>(Collections.nCopies(input.size!! * input.size!!, 0))
         for ((index, cell) in input.board!!.withIndex()) {
 
-            Log.d("Executor", index.toString())
             // Calculate x and y
             val x: Int = index % input.size
             val y: Int = index / input.size

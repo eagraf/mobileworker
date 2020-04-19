@@ -1,20 +1,25 @@
 package com.github.eagraf.mobileworker
 
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ToggleButton
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     val NOTIFICATION_CHANNEL_ID = "mobile_worker_notification_channel"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Setup UI
@@ -36,8 +41,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Schedule plugin job
-        val jobInfo = JobInfo.Builder(2216, ComponentName(this, PluginJobService::class.java))
-            .setPeriodic( 60 * 1000) // TODO determine best period
+        /*val jobInfo = JobInfo.Builder(2216, ComponentName(this, PluginJobService::class.java))
+            .setPeriodic(60 * 1000) // TODO determine best period
             .setPersisted(true)
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
             .setRequiresCharging(true)
@@ -46,7 +51,12 @@ class MainActivity : AppCompatActivity() {
 
         val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         val scheduleResult = jobScheduler.schedule(jobInfo)
-        Log.d("MainActivity", "Scheduling Result " + scheduleResult)
+        Log.d("MainActivity", "Scheduling Result " + scheduleResult)*/
+
+        // Setup alarms for testing at 1am, 2am and 3am est
+        setFirstAlarm(this, 1, 0)
+        setFirstAlarm(this, 2, 0)
+        setFirstAlarm(this, 3, 0)
 
         // Setup executor
         val executor = Executor()
