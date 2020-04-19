@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity() {
 
         // Schedule plugin job
         val jobInfo = JobInfo.Builder(2216, ComponentName(this, PluginJobService::class.java))
+            .setPeriodic( 60 * 1000) // TODO determine best period
+            .setPersisted(true)
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
             .setRequiresCharging(true)
             //.setRequiresDeviceIdle(true)
@@ -46,8 +48,11 @@ class MainActivity : AppCompatActivity() {
         val scheduleResult = jobScheduler.schedule(jobInfo)
         Log.d("MainActivity", "Scheduling Result " + scheduleResult)
 
+        // Setup executor
+        val executor = Executor()
+
         // Setup websocket connection
-        val cm = ConnectionManager()
+        val cm = ConnectionManager(executor)
         val connectionToggle: ToggleButton = findViewById(R.id.connectionToggle)
         connectionToggle.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {

@@ -3,11 +3,28 @@ package com.github.eagraf.mobileworker
 import android.util.Log
 import okhttp3.*
 import okio.ByteString
+import org.json.JSONObject
 
-class ConnectionManager {
+
+class Message(json: String) : JSONObject(json) {
+    val messageType: String? = this.getString("MessageType")
+    val payload = this.getJSONObject("Payload")
+}
+
+class WorkIntent(json: String) : JSONObject(json) {
+    val intentType: String? = this.getString("IntentType")
+    val taskType: String? = this.getString("TaskType")
+    val taskUUID: String? = this.getString("TaskUUID")
+    val input = this.getJSONObject("Input")
+}
+
+class ConnectionManager(executor: Executor) {
     private var client: OkHttpClient = OkHttpClient()
-    private var webSocket: WebSocket?
+    var webSocket: WebSocket?
     var connected: Boolean
+
+    // TODO: Some sort of pub sub system for different listeners
+    val executor = executor
 
     init {
         webSocket = null
@@ -46,6 +63,13 @@ class WorkerListener(cm: ConnectionManager): WebSocketListener() {
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         Log.d("ConnectionManager","Receiving text: " + text)
+        val message = Message(text)
+        Log.d("ConnectionManager", message.messageType)
+        when (message.messageType) {
+            "Intent" -> handleWorkIntent(message.payload)
+            else -> Log.d("ConnectionManager", "elso")
+        }
+
     }
 
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
@@ -62,5 +86,12 @@ class WorkerListener(cm: ConnectionManager): WebSocketListener() {
         Log.d("ConnectionManager", "Error: " + t.message)
         t.printStackTrace()
         connectionManager.connected = false
+    }
+
+    fun handleWorkIntent(intent: JSONObject) {
+        // Convert into WorkIntent class
+        val workIntent = WorkIntent(intent.toString())
+        Log.d("ConnectionManager", workIntent.taskType)
+        this.connectionManager.executor.onWorkIntentReceived(workIntent, connectionManager)
     }
 }

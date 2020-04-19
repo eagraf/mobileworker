@@ -13,7 +13,8 @@ class WorkerService : IntentService(WorkerService::class.simpleName) {
 
         // Start connection with synchronizer server
         // Setup websocket connection
-        val cm = ConnectionManager()
+        val executor = Executor()
+        val cm = ConnectionManager(executor)
         cm.connect()
     }
 }
