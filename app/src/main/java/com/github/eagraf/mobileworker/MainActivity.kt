@@ -54,9 +54,13 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "Scheduling Result " + scheduleResult)*/
 
         // Setup alarms for testing at 1am, 2am and 3am est
-        setFirstAlarm(this, 1, 0)
-        setFirstAlarm(this, 2, 0)
-        setFirstAlarm(this, 3, 0)
+        setFirstAlarm(this, 1, 0, 1)
+        setFirstAlarm(this, 2, 0, 2)
+        setFirstAlarm(this, 3, 0, 3)
+
+        // Test alarms
+        //setTestAlarm(this, 1000)
+        //setTestAlarm(this, 10000)
 
         // Setup executor
         val executor = Executor()

@@ -22,10 +22,12 @@ class WorkerService : IntentService(WorkerService::class.simpleName) {
             .setContentText("Woohoo")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-        with(NotificationManagerCompat.from(this)) {
+        /*with(NotificationManagerCompat.from(this)) {
             // notificationId is a unique int for each notification that you must define
             notify(0, notificationBuilder.build())
-        }
+        }*/
+
+        startForeground(2216, notificationBuilder.build())
 
 
         // Start connection with synchronizer server
