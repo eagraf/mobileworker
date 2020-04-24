@@ -14,7 +14,7 @@ class WorkerService : IntentService(WorkerService::class.simpleName) {
 
     override fun onHandleIntent(intent: Intent?) {
         Log.d("WorkerService", "I have risen")
-        Toast.makeText(this, "Alarm", Toast.LENGTH_LONG).show()
+        //Toast.makeText(this, "Alarm", Toast.LENGTH_LONG).show()
 
         var notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)

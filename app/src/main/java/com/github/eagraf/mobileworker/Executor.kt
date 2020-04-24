@@ -1,5 +1,6 @@
 package com.github.eagraf.mobileworker
 
+import android.os.Build
 import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
@@ -8,13 +9,33 @@ import kotlin.collections.ArrayList
 
 class Executor() {
     fun onWorkIntentReceived(intent: WorkIntent, connectionManager: ConnectionManager) {
+
+        val start = System.currentTimeMillis()
+
+        lateinit var message: JSONObject
         when(intent.taskType) {
             "Hello" -> Log.d("Executor", "Hello Task")
-            "GOL" -> executeGameOfLife(intent, connectionManager)
+            "GOL" -> message = executeGameOfLife(intent, connectionManager)
+        }
+
+        if (message != null) {
+            val end = System.currentTimeMillis()
+
+            Log.d("Executor", Build.MODEL)
+            Log.d("Executor", Build.MANUFACTURER)
+            message.put("MessageType", "WorkResponse")
+            message.put("start", start)
+            message.put("end", end)
+            message.put("device", Build.MODEL)
+            Log.d("Time:", start.toString() + ", " + end.toString())
+            //Log.d("Message", message.toString())
+            // TODO refactor this into connection manager
+            connectionManager.webSocket!!.send(message.toString())
+            Log.d("Executor", "I'm still alive")
         }
     }
 
-    fun executeGameOfLife(intent: WorkIntent, connectionManager: ConnectionManager) {
+    fun executeGameOfLife(intent: WorkIntent, connectionManager: ConnectionManager) : JSONObject {
        class GameOfLifeInput(json: String) : JSONObject(json) {
            val size: Int? = this.getInt("size")
            val board = this.getJSONArray("board")
@@ -22,8 +43,8 @@ class Executor() {
        }
 
         val input = GameOfLifeInput(intent.input.toString())
-        Log.d("Executor", input.size.toString())
-        Log.d("Executor", input.board.toString())
+        //Log.d("Executor", input.size.toString())
+        //Log.d("Executor", input.board.toString())
 
         // Compute next update
         var nextBoard: MutableList<Int> = ArrayList<Int>(Collections.nCopies(input.size!! * input.size!!, 0))
@@ -68,13 +89,12 @@ class Executor() {
                 }
             }
         }
-        Log.d("Executor", nextBoard.toString())
+        //Log.d("Executor", nextBoard.toString())
 
         // Construct response messsage
         val message = JSONObject()
-        message.put("MessageType", "WorkResponse")
         message.put("Output", JSONArray(nextBoard))
 
-        connectionManager.webSocket!!.send(message.toString())
+        return message
     }
 }

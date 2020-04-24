@@ -1,5 +1,6 @@
 package com.github.eagraf.mobileworker
 
+import android.os.Build
 import android.util.Log
 import okhttp3.*
 import okio.ByteString
@@ -34,7 +35,7 @@ class ConnectionManager(executor: Executor) {
 
     fun connect() {
         Log.d("ConnectionManager", "Connecting")
-        val request = Request.Builder().url("http://ec2-54-196-13-197.compute-1.amazonaws.com:2216/workers?workertype=mobileworker").build()
+        val request = Request.Builder().url("http://ec2-54-196-13-197.compute-1.amazonaws.com:2216/workers/register/?workertype=" + Build.MODEL).build()
         val listener = WorkerListener(this)
 
         webSocket = client.newWebSocket(request, listener)
@@ -58,7 +59,7 @@ class WorkerListener(cm: ConnectionManager): WebSocketListener() {
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         connectionManager.connected = true
-        webSocket.send("hello")
+        //webSocket.send("hello")
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {

@@ -58,8 +58,12 @@ class MainActivity : AppCompatActivity() {
         setFirstAlarm(this, 2, 0, 2)
         setFirstAlarm(this, 3, 0, 3)
 
+       // setFirstAlarm(this, 0, 16, 4)
+//        setFirstAlarm(this, 3, 0, 3)
+//        //setFirstAlarm(this, 3, 0, 3)
+
         // Test alarms
-        //setTestAlarm(this, 1000)
+//        setTestAlarm(this, 1000)
         //setTestAlarm(this, 10000)
 
         // Setup executor

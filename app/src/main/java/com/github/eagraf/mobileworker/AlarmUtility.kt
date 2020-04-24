@@ -52,7 +52,7 @@ fun setAlarm(calendar: Calendar, context: Context, code: Int) {
     if (alarmIntent == null) {
         Log.d("AlarmUtility", "Alarm is already set")
     } else {
-        Log.d("AlarmUtility", "Setting alarm for " + calendar.timeInMillis.toString())
+        Log.d("AlarmUtility", "Setting alarm for " + calendar.toString())
         // Set the alarm
         alarmMgr?.setExact(
             AlarmManager.RTC_WAKEUP,
