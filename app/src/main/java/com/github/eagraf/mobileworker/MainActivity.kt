@@ -13,12 +13,16 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.RadioButton
 import android.widget.ToggleButton
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     val NOTIFICATION_CHANNEL_ID = "mobile_worker_notification_channel"
+
+    var executionType = "java";
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         //setTestAlarm(this, 10000)
 
         // Setup executor
-        val executor = Executor()
+        val executor = ARTExecutor()
 
         // Setup websocket connection
         val cm = ConnectionManager(executor)
@@ -84,6 +88,24 @@ class MainActivity : AppCompatActivity() {
                 cm.disconnect()
             }
         }
+    }
 
+    fun onRadioButtonClicked(view: View) {
+        if (view is RadioButton) {
+            // Is the button now checked?
+            val checked = view.isChecked
+
+            // Check which radio button was clicked
+            when (view.getId()) {
+                R.id.java ->
+                    if (checked) {
+                        Log.d("MainActivity", "Java Executor")
+                    }
+                R.id.renderscript ->
+                    if (checked) {
+                        Log.d("MainActivity", "RenderScript Executor")
+                    }
+            }
+        }
     }
 }
