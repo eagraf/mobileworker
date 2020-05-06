@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     val NOTIFICATION_CHANNEL_ID = "mobile_worker_notification_channel"
 
-    var executionType = "java";
+    lateinit var connectionManager: ConnectionManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,18 +74,18 @@ class MainActivity : AppCompatActivity() {
         val executor = ARTExecutor()
 
         // Setup websocket connection
-        val cm = ConnectionManager(executor)
+        connectionManager = ConnectionManager(executor)
         val connectionToggle: ToggleButton = findViewById(R.id.connectionToggle)
         connectionToggle.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 // Attempt to connect to synchronizer
                 Log.d("MainActivity", "Connect")
-                cm.connect()
+                connectionManager.connect()
 
             } else {
                 // Disconnect from synchronizer
                 Log.d("MainActivity", "Disconnect")
-                cm.disconnect()
+                connectionManager.disconnect()
             }
         }
     }
@@ -100,10 +100,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.java ->
                     if (checked) {
                         Log.d("MainActivity", "Java Executor")
+                        connectionManager.executor = ARTExecutor()
                     }
                 R.id.renderscript ->
                     if (checked) {
                         Log.d("MainActivity", "RenderScript Executor")
+                        connectionManager.executor = RenderscriptExecutor()
                     }
             }
         }

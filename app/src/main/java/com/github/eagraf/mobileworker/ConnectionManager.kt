@@ -25,7 +25,7 @@ class ConnectionManager(executor: Executor) {
     var connected: Boolean
 
     // TODO: Some sort of pub sub system for different listeners
-    val executor = executor
+    var executor = executor
 
     init {
         webSocket = null
