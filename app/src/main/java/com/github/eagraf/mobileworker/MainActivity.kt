@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.renderscript ->
                     if (checked) {
                         Log.d("MainActivity", "RenderScript Executor")
-                        connectionManager.executor = RenderscriptExecutor()
+                        connectionManager.executor = RenderscriptExecutor(this)
                     }
             }
         }
