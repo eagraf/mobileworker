@@ -17,6 +17,7 @@ class RenderscriptExecutor(context: Context) : Executor() {
     // TODO this pattern aint good
     var script: ScriptC_gol? = null
     var inBuffer: Allocation? = null
+    var extraBuffer: Allocation? = null
     var outBuffer: Allocation? = null
 
     override fun executeGameOfLife(intent: WorkIntent): JSONObject {
@@ -37,8 +38,10 @@ class RenderscriptExecutor(context: Context) : Executor() {
 
         // Allocate input buffer
         inBuffer = Allocation.createTyped(rs, Type.createX(rs, Element.U8(rs), size*size))
+        extraBuffer = Allocation.createTyped(rs, Type.createX(rs, Element.U8(rs), size*size))
         // Copy data into buffer
         inBuffer!!.copyFrom(bytes)
+        extraBuffer!!.copyFrom(bytes)
 
         // Initialize outBuffer as well
         val outBytes = ByteArray(size*size) { _ -> 0 }
@@ -60,13 +63,16 @@ class RenderscriptExecutor(context: Context) : Executor() {
         override fun doInBackground(vararg size: Int?): Integer {
             Log.d("RenderScriptExecutor", "Actually executing")
             val start = System.currentTimeMillis()
+            script!!.set_board(extraBuffer)
+            script!!.set_size(size[0]!!)
             script!!.forEach_gol(inBuffer, outBuffer)
 
-            val end = System.currentTimeMillis()
-            Log.d("RenderScriptExecutor", start.toString() + " " + end.toString())
 
             val bytes = ByteArray(size[0]!! * size[0]!!)
             outBuffer!!.copyTo(bytes)
+
+            val end = System.currentTimeMillis()
+            Log.d("RenderScriptExecutor", start.toString() + " " + end.toString())
 
             Log.d("RenderScriptExecutor", JSONArray(bytes).toString())
 
