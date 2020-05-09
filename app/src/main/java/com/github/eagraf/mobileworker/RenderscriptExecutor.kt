@@ -24,24 +24,21 @@ class RenderscriptExecutor(context: Context) : Executor() {
         Log.d("RenderscriptExecutor", "Executing")
         val rs = RenderScript.create(context)
 
-        // Allocate buffers
-        //val inBuffer = Allocation.createFromBitmap(rs, bitmapIn)
-        //val outBuffer = Allocation.createFromBitmap(rs, bitmapOut)
-
+        val allocationStart = System.currentTimeMillis()
         // Convert to byte array
         val size = intent.input.getInt("size")
         val jsonArray = intent.input.getJSONArray("board")
-        Log.d("RenderScriptExecutor", jsonArray.toString())
+        //Log.d("RenderScriptExecutor", jsonArray.toString())
         val bytes = ByteArray(size*size) {
             i ->  (jsonArray.get(i) as Int).toByte()
         }
 
         // Allocate input buffer
         inBuffer = Allocation.createTyped(rs, Type.createX(rs, Element.U8(rs), size*size))
-        extraBuffer = Allocation.createTyped(rs, Type.createX(rs, Element.U8(rs), size*size))
+        //extraBuffer = Allocation.createTyped(rs, Type.createX(rs, Element.U8(rs), size*size))
         // Copy data into buffer
         inBuffer!!.copyFrom(bytes)
-        extraBuffer!!.copyFrom(bytes)
+        //extraBuffer!!.copyFrom(bytes)
 
         // Initialize outBuffer as well
         val outBytes = ByteArray(size*size) { _ -> 0 }
@@ -50,37 +47,37 @@ class RenderscriptExecutor(context: Context) : Executor() {
 
         script = ScriptC_gol(rs)
 
+        val allocationEnd = System.currentTimeMillis()
+        Log.d("RenderScriptExecutor", "Allocation Time: " + allocationStart + ", " + allocationEnd)
+
         // Execute task
+        // TODO this waits for execution to complete, should be completely asynchronous
         val task = RenderScriptTaskGOL()
-        task.execute(size)
+        val newBoard = task.execute(size).get()
+        val res = JSONObject()
+        res.put("Output", JSONArray(newBoard))
 
-
-        return JSONObject()
+        return res
     }
 
     // TODO switch to Kotlin coroutines
-    inner class RenderScriptTaskGOL : AsyncTask<Int, Void, Integer>() {
-        override fun doInBackground(vararg size: Int?): Integer {
-            Log.d("RenderScriptExecutor", "Actually executing")
+    // Asynchronously execute one round of gameoflife
+    inner class RenderScriptTaskGOL : AsyncTask<Int, Void, ByteArray>() {
+        override fun doInBackground(vararg size: Int?): ByteArray {
             val start = System.currentTimeMillis()
-            script!!.set_board(extraBuffer)
+            script!!.set_board(inBuffer)
             script!!.set_size(size[0]!!)
             script!!.forEach_gol(inBuffer, outBuffer)
-
 
             val bytes = ByteArray(size[0]!! * size[0]!!)
             outBuffer!!.copyTo(bytes)
 
             val end = System.currentTimeMillis()
-            Log.d("RenderScriptExecutor", start.toString() + " " + end.toString())
+            Log.d("RenderScriptExecutor", "Execution Time: " + start.toString() + " " + end.toString())
 
-            Log.d("RenderScriptExecutor", JSONArray(bytes).toString())
-
-            return Integer(0)
+            return bytes
         }
-
     }
-
 }
 
 
