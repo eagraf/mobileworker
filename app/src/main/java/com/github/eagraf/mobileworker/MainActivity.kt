@@ -13,12 +13,16 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.RadioButton
 import android.widget.ToggleButton
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     val NOTIFICATION_CHANNEL_ID = "mobile_worker_notification_channel"
+
+    lateinit var connectionManager: ConnectionManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,23 +71,43 @@ class MainActivity : AppCompatActivity() {
         //setTestAlarm(this, 10000)
 
         // Setup executor
-        val executor = Executor()
+        val executor = ARTExecutor()
 
         // Setup websocket connection
-        val cm = ConnectionManager(executor)
+        connectionManager = ConnectionManager(executor)
         val connectionToggle: ToggleButton = findViewById(R.id.connectionToggle)
         connectionToggle.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 // Attempt to connect to synchronizer
                 Log.d("MainActivity", "Connect")
-                cm.connect()
+                connectionManager.connect()
 
             } else {
                 // Disconnect from synchronizer
                 Log.d("MainActivity", "Disconnect")
-                cm.disconnect()
+                connectionManager.disconnect()
             }
         }
+    }
 
+    fun onRadioButtonClicked(view: View) {
+        if (view is RadioButton) {
+            // Is the button now checked?
+            val checked = view.isChecked
+
+            // Check which radio button was clicked
+            when (view.getId()) {
+                R.id.java ->
+                    if (checked) {
+                        Log.d("MainActivity", "Java Executor")
+                        connectionManager.executor = ARTExecutor()
+                    }
+                R.id.renderscript ->
+                    if (checked) {
+                        Log.d("MainActivity", "RenderScript Executor")
+                        connectionManager.executor = RenderscriptExecutor(this)
+                    }
+            }
+        }
     }
 }

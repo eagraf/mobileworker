@@ -32,7 +32,7 @@ class WorkerService : IntentService(WorkerService::class.simpleName) {
 
         // Start connection with synchronizer server
         // Setup websocket connection
-        val executor = Executor()
+        val executor = ARTExecutor()
         val cm = ConnectionManager(executor)
         cm.connect()
     }

@@ -7,7 +7,7 @@ import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Executor() {
+abstract class Executor() {
     fun onWorkIntentReceived(intent: WorkIntent, connectionManager: ConnectionManager) {
 
         val start = System.currentTimeMillis()
@@ -15,7 +15,7 @@ class Executor() {
         lateinit var message: JSONObject
         when(intent.taskType) {
             "Hello" -> Log.d("Executor", "Hello Task")
-            "GOL" -> message = executeGameOfLife(intent, connectionManager)
+            "GOL" -> message = executeGameOfLife(intent)
         }
 
         if (message != null) {
@@ -35,7 +35,9 @@ class Executor() {
         }
     }
 
-    fun executeGameOfLife(intent: WorkIntent, connectionManager: ConnectionManager) : JSONObject {
+    abstract fun executeGameOfLife(intent: WorkIntent) : JSONObject
+
+    /*fun executeGameOfLife(intent: WorkIntent, connectionManager: ConnectionManager) : JSONObject {
        class GameOfLifeInput(json: String) : JSONObject(json) {
            val size: Int? = this.getInt("size")
            val board = this.getJSONArray("board")
@@ -96,5 +98,5 @@ class Executor() {
         message.put("Output", JSONArray(nextBoard))
 
         return message
-    }
+    }*/
 }
