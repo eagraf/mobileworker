@@ -6,6 +6,7 @@ import okhttp3.*
 import okio.ByteString
 import org.json.JSONObject
 import java.nio.charset.Charset
+import java.util.zip.Deflater
 import java.util.zip.Inflater
 
 
@@ -52,6 +53,18 @@ class ConnectionManager(executor: Executor) {
             webSocket!!.close(1000, "User forced close")
             connected = false
         }
+    }
+
+    fun send(message: JSONObject) {
+        // Compress message
+        val deflated = ByteArray(message.toString().length)
+        val deflater = Deflater()
+        deflater.setInput(message.toString().toByteArray(Charsets.UTF_8))
+        deflater.finish()
+        val len = deflater.deflate(deflated)
+
+        // Send via websocket
+        webSocket!!.send(ByteString.of(deflated, 0, len))
     }
 }
 

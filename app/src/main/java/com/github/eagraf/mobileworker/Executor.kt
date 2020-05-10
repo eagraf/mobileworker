@@ -15,6 +15,7 @@ abstract class Executor() {
 
         val start = System.currentTimeMillis()
 
+        // Choose what to execute
         lateinit var message: JSONObject
         when(intent.taskType) {
             "Hello" -> Log.d("Executor", "Hello Task")
@@ -26,21 +27,16 @@ abstract class Executor() {
 
             Log.d("Executor", Build.MODEL)
             Log.d("Executor", Build.MANUFACTURER)
+
+            // Build message
             message.put("MessageType", "WorkResponse")
             message.put("start", start)
             message.put("end", end)
             message.put("device", Build.MODEL)
             Log.d("Time:", start.toString() + ", " + end.toString())
-            // TODO refactor this into connection manager
 
-            val deflated = ByteArray(message.toString().length)
-            val deflater = Deflater()
-            deflater.setInput(message.toString().toByteArray(Charsets.UTF_8))
-            deflater.finish()
-            val len = deflater.deflate(deflated)
-
-            connectionManager.webSocket!!.send(ByteString.of(deflated, 0, len))
-            Log.d("Executor", "I'm still alive")
+            // Send message
+            connectionManager.send(message)
         }
     }
 
