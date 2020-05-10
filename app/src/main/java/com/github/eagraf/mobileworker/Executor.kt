@@ -2,9 +2,12 @@ package com.github.eagraf.mobileworker
 
 import android.os.Build
 import android.util.Log
+import okio.ByteString
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
+import java.util.zip.Deflater
+import java.util.zip.Inflater
 import kotlin.collections.ArrayList
 
 abstract class Executor() {
@@ -28,9 +31,15 @@ abstract class Executor() {
             message.put("end", end)
             message.put("device", Build.MODEL)
             Log.d("Time:", start.toString() + ", " + end.toString())
-            //Log.d("Message", message.toString())
             // TODO refactor this into connection manager
-            connectionManager.webSocket!!.send(message.toString())
+
+            val deflated = ByteArray(message.toString().length)
+            val deflater = Deflater()
+            deflater.setInput(message.toString().toByteArray(Charsets.UTF_8))
+            deflater.finish()
+            val len = deflater.deflate(deflated)
+
+            connectionManager.webSocket!!.send(ByteString.of(deflated, 0, len))
             Log.d("Executor", "I'm still alive")
         }
     }

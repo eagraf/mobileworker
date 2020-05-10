@@ -5,6 +5,8 @@ import android.util.Log
 import okhttp3.*
 import okio.ByteString
 import org.json.JSONObject
+import java.nio.charset.Charset
+import java.util.zip.Inflater
 
 
 class Message(json: String) : JSONObject(json) {
@@ -63,7 +65,7 @@ class WorkerListener(cm: ConnectionManager): WebSocketListener() {
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-        Log.d("ConnectionManager","Receiving text: " + text)
+        //Log.d("ConnectionManager","Receiving text: " + text)
         val message = Message(text)
         Log.d("ConnectionManager", message.messageType)
         when (message.messageType) {
@@ -74,7 +76,21 @@ class WorkerListener(cm: ConnectionManager): WebSocketListener() {
     }
 
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-        Log.d("ConnectionManager", "Receiving bytes: " + bytes.hex())
+        Log.d("ConnectionManager", "Receiving bytes")
+
+        // Inflate message
+        val inflater = Inflater();
+        inflater.setInput(bytes.toByteArray(), 0, bytes.size())
+        val res = ByteArray(bytes.size() * 20)           // TODO the buffer size is an arbitrary choice and should be refined
+        val len = inflater.inflate(res)
+        inflater.end()
+
+        // Handle the message
+        val message = Message(String(res, Charsets.UTF_8))
+        when (message.messageType) {
+            "Intent" -> handleWorkIntent(message.payload)
+            else -> Log.d("ConnectionManager", "elso")
+        }
     }
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
